@@ -1,0 +1,76 @@
+version: '3.4'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: ./docker-src/cms/Dockerfile
+      target: php-dev
+    image: mobomo/mobomou-php:latest
+    container_name: mobomou-php
+    env_file: environment
+    environment:
+      - CONNECTBACK=off
+      - DRUPAL_MYSQL_HOST=mobomou-db
+    links:
+      - db
+      - memcache
+    depends_on:
+      - db
+      - memcache
+    networks:
+      - mobomou
+    volumes:
+      - "./composer.json:/var/www/composer.json"
+      - "./web:/var/www/web"
+      - "./config:/var/www/config"
+      - "./vendor:/var/www/vendor"
+      - "./tests:/var/www/tests"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker-src/cms/Dockerfile
+      target: web-dev
+    image: mobomo/mobomou-web:latest
+    container_name: mobomou-web
+    ports:
+      - 8080:80
+      - 8443:443
+    networks:
+      - mobomou
+    links:
+      - php
+    depends_on:
+      - php
+    volumes:
+      - "./web:/var/www/web:ro"
+
+  db:
+    image: percona:5
+    container_name: mobomou-db
+    env_file: environment
+    volumes:
+      - "./docker-src/db/conf:/etc/my.cnf.d"
+      - "database:/var/lib/mysql"
+    networks:
+      - mobomou
+    healthcheck:
+      test: "mysqladmin ping -uroot -proot -hlocalhost"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  memcache:
+    image: memcached:1.5-alpine
+    container_name: mobomou-memcached
+    environment:
+      - MEMCACHED_SERVER=mobomou-memcached
+    networks:
+      - mobomou
+
+networks:
+  mobomou:
+
+volumes:
+  database: {}

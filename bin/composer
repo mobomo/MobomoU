@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+readonly PROGDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd)"
+readonly PROJECTDIR="$(dirname "$PROGDIR")"
+readonly ARGS="$@"
+
+docker run \
+  --rm \
+  -t \
+  -v $(pwd)/composer.json:/app/composer.json \
+  -v $(pwd)/composer.lock:/app/composer.lock \
+  -v $(pwd)/web:/app/web \
+  -v $(pwd)/vendor:/app/vendor \
+  -v $(pwd)/scripts:/app/scripts \
+  -v composer-cache:/tmp/cache \
+  mobomo/composer $ARGS

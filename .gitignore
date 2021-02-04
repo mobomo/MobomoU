@@ -1,0 +1,6 @@
+vendor
+web/libraries
+web/modules/contrib
+web/themes/contrib
+web/profiles/contrib
+!web/profiles/contrib/opigno_lms

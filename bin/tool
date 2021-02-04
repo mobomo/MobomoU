@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+readonly PROGDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd)"
+readonly PROJECT="$(basename "$(dirname "$PROGDIR")")"
+
+USING_STDIN="t"
+
+# if using stdin then we need to disable tty mode
+if [ ! -t 0 ] ; then USING_STDIN=""; fi
+
+# allow dynamic variables like columns
+shopt -s checkwinsize
+
+for PARAM in "$@"
+do
+  PARAMS="${PARAMS} \"${PARAM}\""
+done
+
+docker exec -i$USING_STDIN -e COLUMNS=$COLUMNS mobomou-php sh -c "${PARAMS}"
