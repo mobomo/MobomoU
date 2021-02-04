@@ -1,5 +1,6 @@
 vendor
 
+web/core
 web/libraries
 web/modules/contrib
 web/themes/contrib
